@@ -4,7 +4,8 @@ export const fixtures = {
 		DIFFICULTY: (5).toString(),
 		COOKIE_NAME: 'heimdallr.attestation',
 		COOKIE_MAX_AGE: (7 * 24 * 60 * 60).toString(),
-		ADD_STATUS_HEADER: '1',
+		ADD_STATUS_HEADER: 'true',
+		MOCK_ORIGIN_RESPONSE: 'true',
 	},
 
 	valid: {
