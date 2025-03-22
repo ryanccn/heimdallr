@@ -6,5 +6,6 @@ import { config } from '@ryanccn/eslint-config';
 
 export default config({
 	globals: ['es2024'],
+	ignores: ['**/coverage'],
 	stylistic: true,
 });

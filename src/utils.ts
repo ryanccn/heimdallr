@@ -11,13 +11,14 @@ const HTML_ESCAPE_MAP: Record<string, string> = {
 };
 
 export const escapeHTML = (s: string) => {
-	return s.replaceAll(/[&<>"']/g, (v) => HTML_ESCAPE_MAP[v]!);
+	return s.replaceAll(/[&<>"']/g, /* istanbul ignore next -- @preserve */ (v) => HTML_ESCAPE_MAP[v]!);
 };
 
 export const matchPathSegments = (u: URL, s: string[]) => {
 	const a = u.pathname.split('/').slice(0, s.length + 1);
 	const b = ['', ...s];
 
+	/* istanbul ignore if -- @preserve */
 	if (a.length !== b.length) return false;
 
 	for (const [i, elem] of a.entries()) {

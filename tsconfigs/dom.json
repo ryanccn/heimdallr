@@ -1,8 +1,0 @@
-{
-	"extends": "./base.json",
-	"compilerOptions": {
-		"lib": ["es2024", "dom", "dom.iterable"],
-		"types": []
-	},
-	"include": ["../src/client/**/*.ts"]
-}

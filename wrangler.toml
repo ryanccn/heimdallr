@@ -4,7 +4,7 @@
 
 name = "heimdallr"
 main = "dist/index.js"
-compatibility_date = "2025-03-22"
+compatibility_date = "2025-03-19"
 
 no_bundle = true
 workers_dev = false

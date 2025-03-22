@@ -25,18 +25,9 @@ import {
 } from 'valibot';
 
 import { escapeHTML, matchPathSegments, sha256, uint8ArrayToHex } from './utils';
+import { transformEnv, type Env } from './env';
 
-const CONFIG = {
-	difficulty: 5,
-	cookieName: 'heimdallr.attestation',
-	cookieMaxAge: 7 * 24 * 60 * 60,
-	addStatusHeader: true,
-} as const;
-
-type Env = {
-	JWT_SECRET: string;
-	MOCK_ORIGIN_RESPONSE?: string;
-};
+type HContext = Context<{ Bindings: Env }>;
 
 const attestationCookieOptions = {
 	path: '/',
@@ -45,22 +36,22 @@ const attestationCookieOptions = {
 	sameSite: 'lax',
 } satisfies CookieOptions;
 
-const setAttestationCookie = (c: Context, value: string) =>
-	setCookie(c, CONFIG.cookieName, value, {
+const setAttestationCookie = (c: HContext, value: string) =>
+	setCookie(c, c.env.CONFIG.cookieName, value, {
 		...attestationCookieOptions,
-		expires: new Date(Date.now() + CONFIG.cookieMaxAge * 1000),
+		expires: new Date(Date.now() + c.env.CONFIG.cookieMaxAge * 1000),
 	});
 
-const deleteAttestationCookie = (c: Context) =>
-	deleteCookie(c, CONFIG.cookieName, attestationCookieOptions);
+const deleteAttestationCookie = (c: HContext) =>
+	deleteCookie(c, c.env.CONFIG.cookieName, attestationCookieOptions);
 
-const makeChallenge = async (req: Request, secret: string) => {
+const makeChallenge = async (req: Request, env: Env) => {
 	const realIP = req.headers.get('x-real-ip') ?? '';
 	const userAgent = req.headers.get('user-agent') ?? '';
 	const acceptLanguage = req.headers.get('accept-language') ?? '';
-	const partialDate = Math.floor(Date.now() / (CONFIG.cookieMaxAge * 1000));
-	const { difficulty } = CONFIG;
-	const secretDrv = await sha256(secret).then((v) => uint8ArrayToHex(v));
+	const partialDate = Math.floor(Date.now() / (env.CONFIG.cookieMaxAge * 1000));
+	const { difficulty } = env.CONFIG;
+	const secretDrv = await sha256(env.CONFIG.jwtSecret).then((v) => uint8ArrayToHex(v));
 
 	const data = 'v1,'
 		+ `realIP=${realIP},`
@@ -123,12 +114,10 @@ app.get(
 			return c.json({ error: 'Invalid redirect' }, 400);
 		}
 
-		const challenge = await makeChallenge(c.req.raw, c.env.JWT_SECRET)
-			.then((v) => uint8ArrayToHex(v));
-		const hash = await sha256(challenge + nonce)
-			.then((v) => uint8ArrayToHex(v));
+		const challenge = await makeChallenge(c.req.raw, c.env).then((v) => uint8ArrayToHex(v));
+		const hash = await sha256(challenge + nonce).then((v) => uint8ArrayToHex(v));
 
-		if (!hash.startsWith('0'.repeat(CONFIG.difficulty))) {
+		if (!hash.startsWith('0'.repeat(c.env.CONFIG.difficulty))) {
 			deleteAttestationCookie(c);
 			return c.json({ error: 'Invalid attestation' }, 403);
 		}
@@ -140,9 +129,9 @@ app.get(
 			// challenge,
 			nonce,
 			iat: now,
-			exp: now + CONFIG.cookieMaxAge,
+			exp: now + c.env.CONFIG.cookieMaxAge,
 			nbf: now - 30,
-		}, c.env.JWT_SECRET, 'HS256');
+		}, c.env.CONFIG.jwtSecret, 'HS256');
 
 		setAttestationCookie(c, jwt);
 		return c.redirect(redirect, 302);
@@ -151,9 +140,9 @@ app.get(
 app.get('/interstitial', async (c) => {
 	const cspNonce = c.get('secureHeadersNonce') ?? '';
 
-	const challenge = await makeChallenge(c.req.raw, c.env.JWT_SECRET)
+	const challenge = await makeChallenge(c.req.raw, c.env)
 		.then((v) => uint8ArrayToHex(v));
-	const { difficulty } = CONFIG;
+	const { difficulty } = c.env.CONFIG;
 
 	const head = [
 		`<script type="module" nonce="${escapeHTML(cspNonce)}">`
@@ -197,9 +186,9 @@ const validate = async (req: Request, env: Env): Promise<ValidateOutcome> => {
 	const userAgent = req.headers.get('user-agent');
 	if (!!userAgent && !userAgent.toLowerCase().includes('mozilla')) return 'ignore';
 
-	const cookies = parseCookie(req.headers.get('cookie') ?? '', CONFIG.cookieName);
+	const cookies = parseCookie(req.headers.get('cookie') ?? '', env.CONFIG.cookieName);
 
-	const attestationJWT = cookies[CONFIG.cookieName];
+	const attestationJWT = cookies[env.CONFIG.cookieName];
 	if (!attestationJWT) {
 		return 'fail';
 	}
@@ -207,7 +196,7 @@ const validate = async (req: Request, env: Env): Promise<ValidateOutcome> => {
 	let payload;
 
 	try {
-		payload = await verifyJWT(attestationJWT, env.JWT_SECRET, 'HS256');
+		payload = await verifyJWT(attestationJWT, env.CONFIG.jwtSecret, 'HS256');
 	} catch {
 		return 'fail';
 	}
@@ -221,12 +210,10 @@ const validate = async (req: Request, env: Env): Promise<ValidateOutcome> => {
 
 	const { nonce } = attestation;
 
-	const challenge = await makeChallenge(req, env.JWT_SECRET)
-		.then((v) => uint8ArrayToHex(v));
-	const hash = await sha256(challenge + nonce)
-		.then((v) => uint8ArrayToHex(v));
+	const challenge = await makeChallenge(req, env).then((v) => uint8ArrayToHex(v));
+	const hash = await sha256(challenge + nonce).then((v) => uint8ArrayToHex(v));
 
-	if (!hash.startsWith('0'.repeat(CONFIG.difficulty))) {
+	if (!hash.startsWith('0'.repeat(env.CONFIG.difficulty))) {
 		return 'fail';
 	}
 
@@ -246,8 +233,8 @@ const validate = async (req: Request, env: Env): Promise<ValidateOutcome> => {
 };
 
 export default {
-	fetch: async (req, env, ctx) => {
-		if (env.JWT_SECRET === undefined) throw new Error('JWT_SECRET is not configured');
+	fetch: async (req, rawEnv, ctx) => {
+		const env = transformEnv(rawEnv);
 
 		if (matchPathSegments(new URL(req.url), ['.heimdallr'])) {
 			return app.fetch(req, env, ctx);
@@ -260,22 +247,23 @@ export default {
 			return app.fetch(patchedReq, env, ctx);
 		}
 
-		if (env.MOCK_ORIGIN_RESPONSE === '1') {
+		/* istanbul ignore else -- @preserve */
+		if (env.CONFIG.mockOriginResponse) {
 			return new Response(outcome, {
 				headers: {
 					'content-type': 'text/plain;charset=utf-8',
 					'x-heimdallr-status': outcome,
 				},
 			});
+		} else {
+			const originResp = await fetch(req);
+			const resp = new Response(originResp.body, originResp);
+
+			if (env.CONFIG.addStatusHeader) {
+				resp.headers.set('x-heimdallr-status', outcome);
+			}
+
+			return resp;
 		}
-
-		const originResp = await fetch(req);
-		const resp = new Response(originResp.body, originResp);
-
-		if (CONFIG.addStatusHeader) {
-			resp.headers.set('x-heimdallr-status', outcome);
-		}
-
-		return resp;
 	},
-} satisfies ExportedHandler<Env>;
+} satisfies ExportedHandler;

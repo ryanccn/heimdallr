@@ -1,0 +1,9 @@
+{
+	"extends": "../../tsconfigs/base.json",
+	"compilerOptions": {
+		"lib": ["es2024", "dom", "dom.iterable"],
+		"downlevelIteration": true,
+		"types": []
+	},
+	"include": ["./**/*.ts"]
+}
