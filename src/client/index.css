@@ -1,0 +1,161 @@
+/*
+ * SPDX-FileCopyrightText: 2025 Ryan Cao <hello@ryanccn.dev>
+ *
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
+
+*,
+::before,
+::after {
+	box-sizing: border-box;
+}
+
+p {
+	margin: 0;
+}
+
+:root {
+	--color-scheme: light;
+	--foreground: oklch(0.205 0 0);
+	--subtext-1: oklch(0.439 0 0);
+	--subtext-2: oklch(0.556 0 0);
+	--background: oklch(1 0 0);
+	--green: oklch(0.723 0.219 149.579);
+	--red: oklch(0.637 0.237 25.331);
+	--blue: oklch(0.623 0.214 259.815);
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--color-scheme: dark;
+		--foreground: oklch(1 0 0);
+		--subtext-1: oklch(0.708 0 0);
+		--subtext-2: oklch(0.556 0 0);
+		--background: oklch(0.205 0 0);
+		--green: oklch(0.792 0.209 151.711);
+		--red: oklch(0.704 0.191 22.216);
+		--blue: oklch(0.707 0.165 254.624);
+	}
+}
+
+html {
+	font-size: 16px;
+	font-family: system-ui, sans-serif;
+	line-height: 1.15;
+	-webkit-text-size-adjust: 100%;
+	color-scheme: var(--color-scheme);
+}
+
+body {
+	color: var(--foreground);
+	background-color: var(--background);
+	margin: 2.5rem;
+}
+
+@media (width >= 64rem) {
+	body {
+		margin: 4rem;
+	}
+}
+
+#status,
+.info {
+	max-width: 45rem;
+}
+
+#status {
+	display: grid;
+	grid-template-columns: 2.5rem auto;
+	grid-auto-rows: minmax(1.5rem, auto);
+	grid-template-areas:
+		'icon text'
+		'. extra';
+
+	column-gap: 1rem;
+	row-gap: 0.5rem;
+
+	margin-bottom: 2.5rem;
+
+	&.success {
+		color: var(--green);
+	}
+
+	&.failure {
+		color: var(--red);
+	}
+}
+
+#status-text {
+	grid-area: text;
+	align-self: center;
+	font-size: 1.5rem;
+	text-wrap: pretty;
+}
+
+@media (width >= 64rem) {
+	#status-text {
+		font-size: 2rem;
+	}
+}
+
+#status-extra {
+	grid-area: extra;
+	font-size: 0.75rem;
+}
+
+svg {
+	grid-area: icon;
+	display: block;
+	align-self: center;
+	width: 2.5rem;
+	height: 2.5rem;
+}
+
+.i-spinner {
+	animation: spin infinite 0.5s linear;
+}
+
+#status:is(.success, .failure) .i-spinner {
+	display: none;
+}
+
+#status:not(.success) :is(.i-success) {
+	display: none;
+}
+
+#status:not(.failure) :is(.i-failure) {
+	display: none;
+}
+
+.info {
+	font-size: 0.875rem;
+	line-height: 1.5;
+	text-wrap: pretty;
+	color: var(--subtext-1);
+
+	&:last-child {
+		color: var(--subtext-2);
+	}
+
+	&:not(:last-child) {
+		margin-bottom: 0.5rem;
+	}
+
+	a {
+		color: var(--blue);
+		text-decoration-line: underline;
+		text-decoration-color: currentColor;
+		text-decoration-style: solid;
+		text-underline-offset: 2px;
+	}
+}
+
+@keyframes spin {
+	0% {
+		transform: rotate(0);
+	}
+
+	100% {
+		transform: rotate(360deg);
+	}
+}

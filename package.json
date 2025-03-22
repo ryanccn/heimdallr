@@ -1,0 +1,45 @@
+{
+	"name": "@ryanccn/heimdallr",
+	"version": "0.1.0",
+	"type": "module",
+	"private": true,
+	"license": "AGPL-3.0-or-later",
+	"scripts": {
+		"build": "node build.ts",
+		"dev": "wrangler dev",
+		"deploy": "wrangler deploy",
+		"check": "tsc --noEmit",
+		"lint": "eslint .",
+		"format:check": "prettier --check ."
+	},
+	"dependencies": {
+		"@hono/valibot-validator": "^0.5.2",
+		"hono": "^4.7.5",
+		"valibot": "^1.0.0"
+	},
+	"devDependencies": {
+		"@cloudflare/workers-types": "^4.20250320.0",
+		"@eslint/js": "^9.23.0",
+		"@ryanccn/eslint-config": "^0.4.3",
+		"@stylistic/eslint-plugin": "^4.2.0",
+		"@types/html-minifier": "^4.0.5",
+		"@types/node": "^22.13.11",
+		"esbuild": "^0.25.1",
+		"eslint": "^9.23.0",
+		"eslint-plugin-unicorn": "^57.0.0",
+		"html-minifier": "^4.0.0",
+		"lightningcss": "^1.29.3",
+		"prettier": "^3.5.3",
+		"typescript": "^5.8.2",
+		"typescript-eslint": "^8.27.0",
+		"wrangler": "^4.3.0"
+	},
+	"pnpm": {
+		"onlyBuiltDependencies": [
+			"esbuild",
+			"sharp",
+			"workerd"
+		]
+	},
+	"packageManager": "pnpm@10.6.5+sha512.cdf928fca20832cd59ec53826492b7dc25dc524d4370b6b4adbf65803d32efaa6c1c88147c0ae4e8d579a6c9eec715757b50d4fa35eea179d868eada4ed043af"
+}

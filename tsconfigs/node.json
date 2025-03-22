@@ -1,0 +1,7 @@
+{
+	"extends": "./base.json",
+	"compilerOptions": {
+		"types": ["node"]
+	},
+	"include": ["../build.ts", "../eslint.config.js", "../prettier.config.js"]
+}

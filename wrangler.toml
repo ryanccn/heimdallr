@@ -1,0 +1,15 @@
+# SPDX-FileCopyrightText: 2025 Ryan Cao <hello@ryanccn.dev>
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+name = "heimdallr"
+main = "dist/index.js"
+compatibility_date = "2025-03-22"
+
+no_bundle = true
+workers_dev = false
+preview_urls = false
+send_metrics = false
+
+[build]
+command = "node build.ts"
