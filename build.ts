@@ -15,7 +15,7 @@ await rm(relativePath('dist'), { recursive: true, force: true });
 await mkdir(relativePath('dist'));
 
 const html = await readFile(relativePath('src/index.html'), { encoding: 'utf8' })
-	.then((html) => minify(html, { collapseWhitespace: true }));
+	.then((html) => minify(html, { collapseWhitespace: true, removeComments: true }));
 
 const styleSrc = await readFile(relativePath('src/client/index.css'), { encoding: 'utf8' });
 

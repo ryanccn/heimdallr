@@ -169,7 +169,7 @@ app.get('/interstitial', async (c) => {
 		+ `</script>`,
 	];
 
-	const rendered = ASSET_MANIFEST.html.replace('<!-- inject_head -->', head.join(''));
+	const rendered = ASSET_MANIFEST.html.replace('</head>', head.join('') + '</head>');
 
 	c.header('cache-control', 'no-cache');
 	deleteAttestationCookie(c);
