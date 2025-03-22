@@ -11,6 +11,12 @@ import path from 'node:path';
 
 const relativePath = (...parts: string[]) => path.join(import.meta.dirname, ...parts);
 
+const sriHash = async (text: string) => {
+	const digest = await crypto.subtle.digest('SHA-384', new TextEncoder().encode(text));
+	const hash = btoa(Array.from(new Uint8Array(digest), (byte) => String.fromCodePoint(byte)).join(''));
+	return `sha384-${hash}`;
+};
+
 await rm(relativePath('dist'), { recursive: true, force: true });
 await mkdir(relativePath('dist'));
 
@@ -25,7 +31,7 @@ const style = new TextDecoder().decode(
 		filename: 'index.css',
 		minify: true,
 	}).code,
-);
+).trim();
 
 const script = await esbuild({
 	entryPoints: ['src/client/index.ts'],
@@ -34,9 +40,11 @@ const script = await esbuild({
 	bundle: true,
 	minify: true,
 	write: false,
-}).then((result) => result.outputFiles[0]!.text);
+}).then((result) => result.outputFiles[0]!.text.trim());
 
-const assetManifest = { html, style, script };
+const [styleHash, scriptHash] = await Promise.all([sriHash(style), sriHash(script)]);
+
+const assetManifest = { html, style, script, styleHash, scriptHash };
 
 await writeFile(
 	relativePath('dist/asset-manifest.json'),

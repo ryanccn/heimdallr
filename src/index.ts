@@ -8,7 +8,7 @@ import { sign as signJWT, verify as verifyJWT } from 'hono/jwt';
 import { setCookie, deleteCookie } from 'hono/cookie';
 import { parse as parseCookie, type CookieOptions } from 'hono/utils/cookie';
 
-import { secureHeaders, NONCE as cspNonce } from 'hono/secure-headers';
+import { secureHeaders } from 'hono/secure-headers';
 
 import { vValidator } from '@hono/valibot-validator';
 import {
@@ -24,8 +24,8 @@ import {
 	// nonEmpty as vNonEmpty,
 } from 'valibot';
 
-import { escapeHTML, matchPathSegments, sha256, uint8ArrayToHex } from './utils';
 import { transformEnv, type Env } from './env';
+import { matchPathSegments, sha256, uint8ArrayToHex } from './utils';
 
 type HContext = Context<{ Bindings: Env }>;
 
@@ -69,9 +69,8 @@ const app = new Hono<{ Bindings: Env }>().basePath('/.heimdallr');
 app.use((c, next) => secureHeaders({
 	contentSecurityPolicy: {
 		defaultSrc: ['\'none\''],
-		styleSrc: [cspNonce(c, 'style-src')],
-		scriptSrc: [cspNonce(c, 'script-src'), '\'strict-dynamic\''],
-		connectSrc: ['\'self\''],
+		styleSrc: [`'${ASSET_MANIFEST.styleHash}'`],
+		scriptSrc: [`'${ASSET_MANIFEST.scriptHash}'`, '\'strict-dynamic\''],
 	},
 	permissionsPolicy: {
 		geolocation: [],
@@ -138,27 +137,16 @@ app.get(
 	});
 
 app.get('/interstitial', async (c) => {
-	const cspNonce = c.get('secureHeadersNonce') ?? '';
-
 	const challenge = await makeChallenge(c.req.raw, c.env)
 		.then((v) => uint8ArrayToHex(v));
 	const { difficulty } = c.env.CONFIG;
 
-	const head = [
-		`<script type="module" nonce="${escapeHTML(cspNonce)}">`
-		+ ASSET_MANIFEST.script.trim()
-		+ `</script>`,
+	const head = ''
+		+ `<script type="module">${ASSET_MANIFEST.script}</script>`
+		+ `<style>${ASSET_MANIFEST.style}</style>`
+		+ `<script id="challenge-data" type="application/json">${JSON.stringify({ challenge, difficulty })}</script>`;
 
-		`<style nonce="${escapeHTML(cspNonce)}">`
-		+ ASSET_MANIFEST.style.trim()
-		+ `</style>`,
-
-		`<script id="challenge-data" type="application/json">`
-		+ JSON.stringify({ challenge, difficulty })
-		+ `</script>`,
-	];
-
-	const rendered = ASSET_MANIFEST.html.replace('</head>', head.join('') + '</head>');
+	const rendered = ASSET_MANIFEST.html.replace('</head>', head + '</head>');
 
 	c.header('cache-control', 'no-cache');
 	deleteAttestationCookie(c);

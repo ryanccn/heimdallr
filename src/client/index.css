@@ -10,7 +10,7 @@
 	box-sizing: border-box;
 }
 
-p {
+* {
 	margin: 0;
 }
 
@@ -41,7 +41,7 @@ p {
 html {
 	font-size: 16px;
 	font-family: system-ui, sans-serif;
-	line-height: 1.15;
+	line-height: 1.2;
 	-webkit-text-size-adjust: 100%;
 	color-scheme: var(--color-scheme);
 }
@@ -58,9 +58,18 @@ body {
 	}
 }
 
-#status,
-.info {
+body > * {
 	max-width: 45rem;
+}
+
+noscript {
+	display: block;
+	margin-bottom: 1.5rem;
+
+	font-size: 1rem;
+	line-height: 1.5;
+	color: var(--red);
+	word-wrap: pretty;
 }
 
 #status {

@@ -52,13 +52,6 @@ const createTaskFn = () => (() => {
 	// eslint-disable-next-line unicorn/consistent-function-scoping
 	const sha256 = (text: string) => crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
 
-	// eslint-disable-next-line unicorn/consistent-function-scoping
-	const uint8ArrayToHex = (arr: Uint8Array) => {
-		return [...arr]
-			.map((c) => c.toString(16).padStart(2, '0'))
-			.join('');
-	};
-
 	addEventListener('message', (event: MessageEvent<ProofOptions & { nonce: number }>) => {
 		(async () => {
 			const { data, difficulty, concurrency } = event.data;
@@ -85,7 +78,7 @@ const createTaskFn = () => (() => {
 				}
 
 				if (valid) {
-					postMessage({ hash: uint8ArrayToHex(thisHash), nonce });
+					postMessage({ nonce });
 					break;
 				}
 

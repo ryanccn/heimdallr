@@ -6,6 +6,8 @@ interface AssetManifest {
 	html: string;
 	style: string;
 	script: string;
+	styleHash: string;
+	scriptHash: string;
 };
 
 declare const ASSET_MANIFEST: AssetManifest;

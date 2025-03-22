@@ -2,17 +2,17 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-const HTML_ESCAPE_MAP: Record<string, string> = {
-	'&': '&amp;',
-	'<': '&lt;',
-	'>': '&gt;',
-	'"': '&quot;',
-	'\'': '&#39;',
-};
+// const HTML_ESCAPE_MAP: Record<string, string> = {
+// 	'&': '&amp;',
+// 	'<': '&lt;',
+// 	'>': '&gt;',
+// 	'"': '&quot;',
+// 	'\'': '&#39;',
+// };
 
-export const escapeHTML = (s: string) => {
-	return s.replaceAll(/[&<>"']/g, /* istanbul ignore next -- @preserve */ (v) => HTML_ESCAPE_MAP[v]!);
-};
+// export const escapeHTML = (s: string) => {
+// 	return s.replaceAll(/[&<>"']/g, (v) => HTML_ESCAPE_MAP[v]!);
+// };
 
 export const matchPathSegments = (u: URL, s: string[]) => {
 	const a = u.pathname.split('/').slice(0, s.length + 1);
