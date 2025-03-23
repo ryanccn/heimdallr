@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2025 Ryan Cao <hello@ryanccn.dev>
+//
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 import { defineWorkersConfig } from '@cloudflare/vitest-pool-workers/config';
 import { fixtures } from './test/fixtures';
 import { readFile } from 'node:fs/promises';

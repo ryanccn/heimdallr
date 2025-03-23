@@ -34,7 +34,7 @@ const statusExtraElem = document.querySelector<HTMLSpanElement>('#status-extra')
 			redirect,
 			nonce: nonce.toString(),
 			// hash,
-		})}`;
+		}).toString()}`;
 	}, 500);
 })().catch((error) => {
 	console.error(error);

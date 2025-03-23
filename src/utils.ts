@@ -15,11 +15,8 @@
 // };
 
 export const matchPathSegments = (u: URL, s: string[]) => {
-	const a = u.pathname.split('/').slice(0, s.length + 1);
-	const b = ['', ...s];
-
-	/* istanbul ignore if -- @preserve */
-	if (a.length !== b.length) return false;
+	const a = ['', ...s];
+	const b = u.pathname.split('/').slice(0, a.length);
 
 	for (const [i, elem] of a.entries()) {
 		if (elem !== b[i]) return false;

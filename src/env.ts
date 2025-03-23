@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2025 Ryan Cao <hello@ryanccn.dev>
+//
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 import { nonEmpty, object, optional, parse, pipe, safeInteger, string, transform } from 'valibot';
 
 const intStringSchema = () => pipe(string(), transform((v) => Number.parseInt(v)), safeInteger());
@@ -30,11 +34,11 @@ const EnvConfigSchema = pipe(
 	transform((input) => {
 		return {
 			jwtSecret: input.JWT_SECRET,
-			difficulty: input.DIFFICULTY ?? 5,
-			cookieName: input.COOKIE_NAME ?? 'heimdallr.attestation',
-			cookieMaxAge: input.COOKIE_MAX_AGE ?? 7 * 24 * 60 * 60,
-			addStatusHeader: input.ADD_STATUS_HEADER ?? true,
-			mockOriginResponse: input.MOCK_ORIGIN_RESPONSE ?? false,
+			difficulty: input.DIFFICULTY ?? /* istanbul ignore next */ 5,
+			cookieName: input.COOKIE_NAME ?? /* istanbul ignore next */ 'heimdallr.attestation',
+			cookieMaxAge: input.COOKIE_MAX_AGE ?? /* istanbul ignore next */ 7 * 24 * 60 * 60,
+			addStatusHeader: input.ADD_STATUS_HEADER ?? /* istanbul ignore next */ true,
+			mockOriginResponse: input.MOCK_ORIGIN_RESPONSE ?? /* istanbul ignore next */ false,
 		} satisfies Config;
 	}),
 );

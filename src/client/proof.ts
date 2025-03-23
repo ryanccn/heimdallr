@@ -30,11 +30,12 @@ export const calculateProof = (options: ProofOptions) =>
 				resolve(event.data);
 			});
 
-			worker.addEventListener('error', () => {
+			worker.addEventListener('error', (event) => {
 				for (const worker of workers) worker.terminate();
 				worker.terminate();
 
-				reject(new Error('Failed to calculate proof of work'));
+				// eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors
+				reject(event.error ?? new Error(event.message));
 			});
 
 			worker.postMessage({
@@ -58,8 +59,7 @@ const createTaskFn = () => (() => {
 			let { nonce } = event.data;
 
 			while (true) {
-				const currentHash = await sha256(data + nonce);
-				const thisHash = new Uint8Array(currentHash);
+				const thisHash = await sha256(data + nonce).then((v) => new Uint8Array(v));
 				let valid = true;
 
 				for (let j = 0; j < difficulty; j++) {
@@ -84,6 +84,10 @@ const createTaskFn = () => (() => {
 
 				nonce += concurrency;
 			}
-		})().catch((error) => { throw error; });
+		})().catch((error) => {
+			setTimeout(() => {
+				throw error;
+			});
+		});
 	});
 }).toString();
