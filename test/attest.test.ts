@@ -3,10 +3,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { it, expect, assert, vi, beforeAll, afterAll } from 'vitest';
-import { fetchWorker, parseSetCookies } from './utils';
 
 import { verify } from 'hono/jwt';
 import { fixtures } from './fixtures';
+import { fetchWorker, parseSetCookies } from './utils';
 
 beforeAll(() => {
 	vi.useFakeTimers();

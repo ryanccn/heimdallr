@@ -3,19 +3,26 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import {
-	env,
 	createExecutionContext,
 	waitOnExecutionContext,
 } from 'cloudflare:test';
 import { expect } from 'vitest';
+import { fixtures } from './fixtures';
 
 import worker from '../src';
 
-export const fetchWorker = async (request: Request) => {
+export const fetchWorker = async (
+	request: Request,
+	overrideEnv?: (env: typeof fixtures.env) => Record<string, unknown> | PromiseLike<Record<string, unknown>>,
+) => {
 	const ctx = createExecutionContext();
 
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-explicit-any
-	const response = await (worker as ExportedHandler).fetch!(request as any, env, ctx);
+	const response = await (worker as ExportedHandler).fetch!(
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-explicit-any
+		request as any,
+		overrideEnv === undefined ? fixtures.env : await overrideEnv(fixtures.env),
+		ctx,
+	);
 
 	await waitOnExecutionContext(ctx);
 	return response;

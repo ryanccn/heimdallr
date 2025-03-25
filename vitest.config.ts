@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { defineWorkersConfig } from '@cloudflare/vitest-pool-workers/config';
-import { fixtures } from './test/fixtures';
 import { readFile } from 'node:fs/promises';
 
 const ASSET_MANIFEST = await readFile('dist/asset-manifest.json', { encoding: 'utf8' });
@@ -24,12 +23,6 @@ export default defineWorkersConfig({
 			workers: {
 				wrangler: {
 					configPath: './wrangler.toml',
-				},
-
-				miniflare: {
-					bindings: {
-						...fixtures.env,
-					},
 				},
 			},
 		},

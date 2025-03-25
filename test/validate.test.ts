@@ -4,9 +4,9 @@
 
 import { expect, it, vi, beforeAll, afterAll, afterEach } from 'vitest';
 
+import { sign } from 'hono/jwt';
 import { expectInterstitial, fetchWorker, parseSetCookies } from './utils';
 import { fixtures } from './fixtures';
-import { sign } from 'hono/jwt';
 
 beforeAll(() => {
 	vi.useFakeTimers();
@@ -38,24 +38,61 @@ const obtainJWT = async (fixtureType: 'valid' | 'expired' | 'future') => {
 	return jwt;
 };
 
-it.each([
-	{ type: 'strong', mathRandomValue: 0 },
-	{ type: 'weak', mathRandomValue: 1 },
-])('valid JWT is valid ($type validation)', async ({ type, mathRandomValue }) => {
-	const jwt = await obtainJWT('valid');
+const validationTypes = ['strong', 'weak'] as const;
+const mockOriginResponses = [false, true] as const;
+const addStatusHeaders = [false, true] as const;
 
-	const request = new Request(`http://test.local/`, {
-		headers: {
-			cookie: `${fixtures.env.COOKIE_NAME}=${jwt}`,
-		},
-	});
+const combinations = validationTypes.flatMap(
+	(validationType) => mockOriginResponses.flatMap(
+		(mockOriginResponse) => addStatusHeaders.flatMap(
+			(addStatusHeader) => ({ validationType, mockOriginResponse, addStatusHeader }),
+		),
+	),
+);
 
-	vi.spyOn(Math, 'random').mockImplementationOnce(() => mathRandomValue);
-	const response = await fetchWorker(request);
+it.each(combinations)(
+	'valid JWT is valid ($validationType, $mockOriginResponse, $addStatusHeader)',
+	async ({ validationType, mockOriginResponse, addStatusHeader }) => {
+		const jwt = await obtainJWT('valid');
 
-	expect(response.status).toBe(200);
-	expect(response.headers.get('x-heimdallr-status')).toBe(`pass-${type}`);
-});
+		const request = new Request(`http://test.local/`, {
+			headers: {
+				cookie: `${fixtures.env.COOKIE_NAME}=${jwt}`,
+			},
+		});
+
+		vi.spyOn(Math, 'random').mockImplementationOnce(() => validationType === 'strong' ? 0 : 1);
+
+		if (!mockOriginResponse) {
+			vi.spyOn(globalThis, 'fetch').mockImplementation((input) => {
+				let url;
+				if (input instanceof Request) url = input.url.toString();
+				else if (input instanceof URL) url = input.toString();
+				else url = input;
+
+				if (url !== 'http://test.local/')
+					throw new Error('Mock implementation of `fetch` should not have been called for non-testing URL');
+
+				return Promise.resolve(new Response(null, { headers: { 'x-test-origin-response': '1' } }));
+			});
+		}
+
+		const response = await fetchWorker(
+			request,
+			(env) => ({
+				...env,
+				ADD_STATUS_HEADER: addStatusHeader ? 'true' : 'false',
+				MOCK_ORIGIN_RESPONSE: mockOriginResponse ? 'true' : 'false',
+			}),
+		);
+
+		expect(response.status).toBe(200);
+		expect(response.headers.get('x-heimdallr-status'))
+			.toBe(addStatusHeader ? `pass-${validationType}` : null);
+		expect(response.headers.get('x-test-origin-response'))
+			.toBe(mockOriginResponse ? null : '1');
+	},
+);
 
 it('expired JWT is invalid', async () => {
 	const jwt = await obtainJWT('expired');

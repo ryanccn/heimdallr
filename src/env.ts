@@ -34,11 +34,11 @@ const EnvConfigSchema = pipe(
 	transform((input) => {
 		return {
 			jwtSecret: input.JWT_SECRET,
-			difficulty: input.DIFFICULTY ?? /* istanbul ignore next */ 5,
-			cookieName: input.COOKIE_NAME ?? /* istanbul ignore next */ 'heimdallr.attestation',
-			cookieMaxAge: input.COOKIE_MAX_AGE ?? /* istanbul ignore next */ 7 * 24 * 60 * 60,
-			addStatusHeader: input.ADD_STATUS_HEADER ?? /* istanbul ignore next */ true,
-			mockOriginResponse: input.MOCK_ORIGIN_RESPONSE ?? /* istanbul ignore next */ false,
+			difficulty: input.DIFFICULTY ?? 5,
+			cookieName: input.COOKIE_NAME ?? 'heimdallr.attestation',
+			cookieMaxAge: input.COOKIE_MAX_AGE ?? 7 * 24 * 60 * 60,
+			addStatusHeader: input.ADD_STATUS_HEADER ?? true,
+			mockOriginResponse: input.MOCK_ORIGIN_RESPONSE ?? false,
 		} satisfies Config;
 	}),
 );

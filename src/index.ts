@@ -235,23 +235,23 @@ export default {
 			return app.fetch(patchedReq, env, ctx);
 		}
 
-		/* istanbul ignore else -- @preserve */
+		let resp;
+
 		if (env.CONFIG.mockOriginResponse) {
-			return new Response(outcome, {
+			resp = new Response(outcome, {
 				headers: {
 					'content-type': 'text/plain;charset=utf-8',
-					'x-heimdallr-status': outcome,
 				},
 			});
 		} else {
 			const originResp = await fetch(req);
-			const resp = new Response(originResp.body, originResp);
-
-			if (env.CONFIG.addStatusHeader) {
-				resp.headers.set('x-heimdallr-status', outcome);
-			}
-
-			return resp;
+			resp = new Response(originResp.body, originResp);
 		}
+
+		if (env.CONFIG.addStatusHeader) {
+			resp.headers.set('x-heimdallr-status', outcome);
+		}
+
+		return resp;
 	},
 } satisfies ExportedHandler;
