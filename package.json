@@ -37,7 +37,7 @@
 		"typescript": "^5.8.2",
 		"typescript-eslint": "^8.28.0",
 		"vitest": "^3.0.9",
-		"wrangler": "^4.4.0"
+		"wrangler": "^4.7.1"
 	},
 	"pnpm": {
 		"onlyBuiltDependencies": [
