@@ -20,7 +20,7 @@
 		"valibot": "^1.0.0"
 	},
 	"devDependencies": {
-		"@cloudflare/vitest-pool-workers": "^0.8.4",
+		"@cloudflare/vitest-pool-workers": "^0.8.24",
 		"@cloudflare/workers-types": "^4.20250321.0",
 		"@eslint/js": "^9.23.0",
 		"@ryanccn/eslint-config": "^0.4.3",
