@@ -28,7 +28,7 @@
 		"@types/html-minifier": "^4.0.5",
 		"@types/node": "^22.13.13",
 		"@vitest/coverage-istanbul": "3.0.9",
-		"esbuild": "^0.25.1",
+		"esbuild": "^0.25.4",
 		"eslint": "^9.23.0",
 		"eslint-plugin-unicorn": "^58.0.0",
 		"html-minifier": "^4.0.0",
