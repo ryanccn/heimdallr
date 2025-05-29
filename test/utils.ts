@@ -17,7 +17,7 @@ export const fetchWorker = async (
 ) => {
 	const ctx = createExecutionContext();
 
-	const response = await (worker as ExportedHandler).fetch!(
+	const response = await worker.fetch(
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-explicit-any
 		request as any,
 		overrideEnv === undefined ? fixtures.env : await overrideEnv(fixtures.env),
@@ -41,6 +41,5 @@ export const expectInterstitial = async (response: Response) => {
 	expect(response.headers.get('content-type')).toMatch('text/html');
 	expect(response.headers.get('x-heimdallr-status')).toBe(null);
 
-	const text = await response.text();
-	expect(text).toMatch(`<script id="challenge-data" type="application/json">`);
+	await expect(response.text()).resolves.toMatch(`<script id="challenge-data" type="application/json">`);
 };

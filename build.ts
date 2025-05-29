@@ -48,7 +48,7 @@ const assetManifest = { html, style, script, styleHash, scriptHash };
 
 await writeFile(
 	relativePath('dist/asset-manifest.json'),
-	JSON.stringify(assetManifest),
+	JSON.stringify(assetManifest, undefined, 2) + '\n',
 	{ encoding: 'utf8' },
 );
 
@@ -66,6 +66,6 @@ const { metafile } = await esbuild({
 
 await writeFile(
 	relativePath('dist/metafile.json'),
-	JSON.stringify(metafile, undefined, 2),
+	JSON.stringify(metafile, undefined, 2) + '\n',
 	{ encoding: 'utf8' },
 );

@@ -16,28 +16,28 @@
 	},
 	"dependencies": {
 		"@hono/valibot-validator": "^0.5.2",
-		"hono": "^4.7.5",
-		"valibot": "^1.0.0"
+		"hono": "^4.7.10",
+		"valibot": "^1.1.0"
 	},
 	"devDependencies": {
-		"@cloudflare/vitest-pool-workers": "^0.8.4",
-		"@cloudflare/workers-types": "^4.20250321.0",
-		"@eslint/js": "^9.23.0",
-		"@ryanccn/eslint-config": "^0.4.3",
-		"@stylistic/eslint-plugin": "^4.2.0",
+		"@cloudflare/vitest-pool-workers": "^0.8.33",
+		"@cloudflare/workers-types": "^4.20250529.0",
+		"@eslint/js": "^9.27.0",
+		"@ryanccn/eslint-config": "^0.5.0",
+		"@stylistic/eslint-plugin": "^4.4.0",
 		"@types/html-minifier": "^4.0.5",
-		"@types/node": "^22.13.13",
-		"@vitest/coverage-istanbul": "3.0.9",
-		"esbuild": "^0.25.1",
-		"eslint": "^9.23.0",
-		"eslint-plugin-unicorn": "^58.0.0",
+		"@types/node": "^22.15.24",
+		"@vitest/coverage-istanbul": "3.1.4",
+		"esbuild": "^0.25.5",
+		"eslint": "^9.27.0",
+		"eslint-plugin-unicorn": "^59.0.1",
 		"html-minifier": "^4.0.0",
-		"lightningcss": "^1.29.3",
+		"lightningcss": "^1.30.1",
 		"prettier": "^3.5.3",
-		"typescript": "^5.8.2",
-		"typescript-eslint": "^8.28.0",
-		"vitest": "^3.0.9",
-		"wrangler": "^4.4.0"
+		"typescript": "^5.8.3",
+		"typescript-eslint": "^8.33.0",
+		"vitest": "^3.1.4",
+		"wrangler": "^4.17.0"
 	},
 	"pnpm": {
 		"onlyBuiltDependencies": [
@@ -46,5 +46,5 @@
 			"workerd"
 		]
 	},
-	"packageManager": "pnpm@10.6.5+sha512.cdf928fca20832cd59ec53826492b7dc25dc524d4370b6b4adbf65803d32efaa6c1c88147c0ae4e8d579a6c9eec715757b50d4fa35eea179d868eada4ed043af"
+	"packageManager": "pnpm@10.11.0+sha512.6540583f41cc5f628eb3d9773ecee802f4f9ef9923cc45b69890fb47991d4b092964694ec3a4f738a420c918a333062c8b925d312f42e4f0c263eb603551f977"
 }
